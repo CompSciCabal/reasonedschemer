@@ -9,7 +9,7 @@ To play along:
 
 * Install Clojure
 * Check out this repo
-* Run `clj -M:clerk`
+* Run `clj -X:clerk`
 
 The last command will start a [Clerk](https://github.com/nextjournal/clerk) notebook and launch you browser pointing to
 it.  Editing and saving one of the files under `notebooks` will cause that
