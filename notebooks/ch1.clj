@@ -4,7 +4,7 @@
 ^{:nextjournal.clerk/visibility {:code :hide}}
 (ns ch1
   (:require
-    [clojure.core.logic :refer [conde fresh run* s# u# ==]]))
+    [clojure.core.logic :refer [conde fresh fail run* s# u# ==]]))
 
 ;; Note that Clojure `core.logic` varies a bit from MiniKanren
 ;;
@@ -22,3 +22,60 @@
 
 (run* [q] u#)
 
+(run* [q] fail)
+
+(run* [q]
+      (== 'pea 'pod))
+
+(run* [q]
+      (== q 'pea))
+
+(run* [q]
+      (== 'pea q))
+
+(run* [q] s#)
+
+(run* [q r]
+       (== q (* 2 r))
+       (== r 5))
+
+(run* [q]
+      (== 'pea 'pea))
+
+(run* [q]
+      (== q q))
+
+(run* [q]
+      (fresh [x]
+             (== 'pea q)))
+
+(run* [q]
+      (fresh [x]
+             (== 'pea x)))
+
+(cons 1 '())
+
+(cons 2 (cons 1 '()))
+
+(run* [q]
+      (fresh [x]
+             (== (cons x '()) q)))
+
+(run* [q]
+      (fresh [x]
+             (== (list x) q)))
+
+(run* [q]
+    (fresh [x]
+          (== q (* 2 x))))
+
+(run* [q]
+      (fresh [x]
+             (== x q)))
+
+(run* [q]
+      (fresh [x]
+             (fresh [y]
+                    (== (list y x y) q))))
+
+;; First week ended with "The Second Law of ==" on page 24
