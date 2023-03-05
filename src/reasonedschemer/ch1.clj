@@ -1,7 +1,9 @@
 ; vim: lispwords=run*,fresh:sw=2:
 (ns reasonedschemer.ch1
   (:require
-    [clojure.core.logic :refer [conde fresh fail run* s# u# == defrel]]))
+    [clojure.core.logic :refer [conde fresh fail run* s# u# == defrel]]
+    [reasonedschemer.util :refer [defrel]]))
+
 
 (run* [q] u#) ; ()
 
@@ -169,12 +171,8 @@
       [(== 'red x) (== 'bean y)])
     (== (list x y 'soup) r))) ; ((split pea soup) (red bean soup))
 
-(defn teacupo
-  [t]
-  (fn [s]
-      (fn []
-          ((conde [(== 'tea t)] [(== 'cup t)])
-           s))))
+(defrel teacupo [t]
+  (conde [(== 'tea t)] [(== 'cup t)]))
 
 (run* [x]
   (teacupo x)) ; (tea cup)
