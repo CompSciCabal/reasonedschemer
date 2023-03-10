@@ -311,9 +311,8 @@
 
 (defrel conso2
   [v l x]
-  (conde
-    [(firsto x v)
-     (resto x l)])) ; #'reasonedschemer.ch1/conso2
+  (firsto x v)
+  (resto x l)) ; #'reasonedschemer.ch1/conso2
 
 (run* [l v]
   (conso2 v (list 'b 'c v) l)) ; ((a b c))

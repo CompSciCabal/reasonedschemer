@@ -1,14 +1,14 @@
-(ns reasonedschemer.util)
+(ns reasonedschemer.util
+  (:require
+    [clojure.core.logic :refer [conde]]))
 
 ; Thanks to Alexander Fertman
 
 (defmacro defrel
-  [rel arglist goal]
+  [rel arglist & goals]
   `(defn ~rel ~arglist
      (fn
        [s#]
        (fn
          []
-         (~goal s#)))))
-
-
+         ((conde [~@goals]) s#)))))
