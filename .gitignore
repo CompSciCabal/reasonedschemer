@@ -1,0 +1,8 @@
+.clerk/
+.clj-kondo/.cache/
+.clj-kondo/babashka/
+.clj-kondo/nextjournal/
+.clj-kondo/rewrite-clj/
+.cpcache/
+.lsp/
+.nrepl-port
