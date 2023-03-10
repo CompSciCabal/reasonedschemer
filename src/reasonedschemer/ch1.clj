@@ -1,4 +1,4 @@
-; vim: lispwords=run*,fresh:sw=2:
+; vim: lispwords=fresh,run,run*:sw=2:
 (ns reasonedschemer.ch1
   (:require
     [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons conso]]

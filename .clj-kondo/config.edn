@@ -1,2 +1,3 @@
-{:hooks {:analyze-call {clojure.core.logic/run* hooks.corelogic/run*}}
+{:hooks {:analyze-call {clojure.core.logic/run* hooks.corelogic/run*
+                        clojure.core.logic/run hooks.corelogic/run}}
  :lint-as {reasonedschemer.util/defrel clojure.core/defn}}
