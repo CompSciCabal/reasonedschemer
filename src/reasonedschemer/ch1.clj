@@ -1,7 +1,7 @@
 ; vim: lispwords=fresh,run,run*:sw=2:
 (ns reasonedschemer.ch1
   (:require
-    [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons conso]]
+    [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo]]
     [reasonedschemer.util :refer [defrel]]))
 
 
@@ -327,3 +327,65 @@
 
 ;; Resume on 2023-03-16 on panel 28
 
+(nil? '(grape raisin pair)) ; false
+
+(nil? '()) ; false
+(nil? nil) ; true
+
+(run* [q] (nilo '(grape raisin pear))) ; ()
+
+(run* [q] (nilo nil)) ; (_0)
+
+(run* [x] (nilo x)) ; (nil)
+
+(defrel nullo [x] (== x '( )))
+
+(lcons 'split 'pea) ; (split . pea)
+(lcons '. '.)  ; (. . .)
+(run* [r]
+  (fresh (x y)
+    (== (lcons x (lcons y 'salad))
+        r))) ; ((_0 _1 . salad))
+
+(defrel pairo [p] (fresh (a d) (conso a d p)))
+
+(run* [q] (pairo (lcons q q))) ; (_0)
+
+(run* [q] (pairo '())) ; ()
+
+(run* [q] (pairo 'pair))  ; ()
+
+(run* [x] (pairo x)) ; ((_0 . _1))
+
+(run* [r] (pairo (cons r '()))) ; (_0)
+
+; (defn singleton? [l]
+;   (cond
+;          (lcons? l) (nil? (rest l))
+;          :else false))
+
+(defrel singletono [l]
+  (fresh [d]
+    (cdro l d)
+    (nullo d)))
+
+(defrel caro [l a]
+  (fresh [d]
+    (conso a d l)))
+
+(defrel cdro [l d]
+  (fresh [a]
+    (conso a d l)))
+
+(run* [l]
+  (fresh [x]
+    (cdro (list l x x) (list 'asd l))))
+
+(defrel listo [l]
+  (conde
+    [(nilo l)]
+    [(fresh [d]
+      (cdro l d)
+      (listo d))]))
+
+; Got to chapter 3, frame 9 right after the law of #s
