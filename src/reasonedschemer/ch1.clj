@@ -1,7 +1,7 @@
 ; vim: lispwords=fresh,run,run*:sw=2:
 (ns reasonedschemer.ch1
   (:require
-    [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo]]
+    [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo emptyo]]
     [reasonedschemer.util :refer [defrel]]))
 
 
@@ -383,9 +383,71 @@
 
 (defrel listo [l]
   (conde
-    [(nilo l)]
+    [(emptyo l)]
     [(fresh [d]
       (cdro l d)
       (listo d))]))
 
 ; Got to chapter 3, frame 9 right after the law of #s
+
+(run 1 [x]
+  (listo (lcons 'a (lcons 'b (lcons 'c x)))))
+
+(run 5 [x]
+  (listo (lcons 'a (lcons 'b (lcons 'c x)))))
+
+(defrel lolo
+  [l]
+  (conde
+    [(nullo l)]
+    [(fresh [a d]
+       (caro l a)
+       (listo a)
+       (cdro l d)
+       (lolo d))]))
+
+(run* [q]
+  (fresh [x y]
+    (lolo (list (list 'a 'b)
+                (list x 'c)
+                (list 'd y)))))
+
+(run 6 [l]
+  (lolo l))
+
+(run 3 [q]
+  (fresh [x]
+    (lolo (lcons (list 'a 'b) x))))
+
+(run 1 [x]
+  (lolo (list (list 'a 'b)
+              (lcons (list 'c 'd) x))))
+
+(run 5 [x]
+  (lolo (list (list 'a 'b)
+              (lcons (list 'c 'd) x))))
+
+(run 5 [x]
+  (lolo (lcons (list 'a 'b)
+               (lcons (list 'c 'd) x))))
+
+(run 5 [x]
+  (lolo x))
+
+(defrel singletono [l]
+  (fresh [a]
+    (== l (list a))))
+
+(defrel loso [l]
+  (conde
+    [(emptyo l)]
+    [(fresh [a d]
+       (caro l a)
+       (singletono a)
+       (cdro l d)
+       (loso d))]))
+
+(run 1 [z]
+  (loso (lcons (list 'g) z)))
+
+; Resume at chapter 3, panel 38
