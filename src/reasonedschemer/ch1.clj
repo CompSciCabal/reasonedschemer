@@ -447,7 +447,38 @@
        (cdro l d)
        (loso d))]))
 
-(run 1 [z]
+(run 5 [z]
   (loso (lcons (list 'g) z)))
 
 ; Resume at chapter 3, panel 38
+
+(run 4 [r]
+  (fresh [w x y z]
+    (loso
+      (lcons (list 'g)
+             (lcons (lcons 'e w)
+                    (lcons (lcons x y)
+                           z))))
+    (== (list w (lcons x y) z) r)))
+
+
+(defrel membero [x l]
+  (conde
+    [(fresh [a]
+       (caro l a)
+       (== a x))]
+    [(fresh [d]
+      (cdro l d)
+      (membero x d))]))
+
+(defrel membero2 [x l]
+  (fresh [a d]
+    (== (lcons a d) l)
+    (conde
+      [(== a x)]
+      [(membero2 x d)])))
+
+(run 1 [x]
+  (membero2 'oliver (list 'virgin 'olive 'oil)))
+
+; Resume at ch 3, panel 46
