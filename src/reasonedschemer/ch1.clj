@@ -464,12 +464,12 @@
 
 (defrel membero [x l]
   (conde
-    [(fresh [a]
-       (caro l a)
-       (== a x))]
     [(fresh [d]
       (cdro l d)
-      (membero x d))]))
+      (membero x d))]
+    [(fresh [a]
+       (caro l a)
+       (== a x))]))
 
 (defrel membero2 [x l]
   (fresh [a d]
@@ -478,7 +478,96 @@
       [(== a x)]
       [(membero2 x d)])))
 
+(defrel membero3 [x l]
+  (conde
+    [(caro l x)]
+    [(fresh [d]
+      (cdro l d)
+      (membero3 x d))]))
+
 (run 1 [x]
   (membero2 'oliver (list 'virgin 'olive 'oil)))
 
 ; Resume at ch 3, panel 46
+
+(run 1 [y]
+  (membero3 y (list 'hummus 'with 'pita)))
+
+(run* [y]
+  (membero3 y '(hummus (with pita))))
+
+(run* [y]
+  (membero3 y (lcons 'pear
+                     (lcons 'grape 'peaches))))
+
+(run* [x]
+  (membero3 'e (list 'pasta x 'e 'fagioli)))
+
+(run* [x y]
+  (membero 'e (list 'pasta x 'fagioli y)))
+
+(run* [q]
+  (fresh [x y]
+    (== (list 'pasta x 'fagioli y) q)
+    (membero 'e q)))
+
+(run 1 [l]
+  (membero 'tofu l))
+
+;(_.0 . ('tofu . _.1)) ???
+(run 5 [l]
+  (membero 'tofu l))
+
+(defrel proper-membero [x l]
+  (conde
+    [(caro l x)
+     (fresh [d]
+       (cdro l d)
+       (listo d))]
+    [(fresh [d]
+      (cdro l d)
+      (proper-membero x d))]))
+
+(run 12 [l]
+  (proper-membero 'tofu l))
+
+(def car first)
+(def cdr rest)
+
+(defn proper-member?
+  [x l]
+  (cond
+    (empty? l)    false
+    (= x (car l)) (list? (cdr l))
+    :else         (proper-member? x (cdr l))))
+
+(proper-member? 'a '(a b c))
+
+(defrel appendo
+  [l t out]
+  (conde
+    [(emptyo l) (== t out)]
+    [(fresh [a d res]
+       (conso a d l)
+       (appendo d t res)
+       (conso a res out))]))
+
+(run 1 [x]
+  (appendo '(a b c) x '(a b c d e)))
+
+(run 6 [x]
+  (fresh [y z]
+    (appendo x y z)))
+
+(run 6 [y]
+  (fresh [x z]
+    (appendo x y z)))
+
+(run 6 [z]
+  (fresh [x y]
+    (appendo x y z)))
+
+(run 6 [x y z]
+  (appendo x y z))
+
+; Continue on 2023-04-13 on ch 4, panel 23
