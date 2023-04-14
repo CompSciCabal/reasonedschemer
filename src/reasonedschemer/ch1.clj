@@ -310,17 +310,17 @@
     (== (list 'd 'a x 'c) l))) ; ((d a d c))
 
 (defrel conso2
-  [v l x]
-  (firsto x v)
-  (resto x l)) ; #'reasonedschemer.ch1/conso2
+  [a d l]
+  (firsto l a)
+  (resto l d)) ; #'reasonedschemer.ch1/conso2
 
 (run* [l v]
   (conso2 v (list 'b 'c v) l)) ; ((a b c))
 ; ([(_0 b c _0) _0])
 
 (defrel conso3
-  [v l x]
-  (== (lcons v l) x))
+  [a d l]
+  (== (lcons a d) l))
 
 (run* [l]
   (conso3 'a (list 'b 'c) l)) ; ((a b c))
@@ -549,8 +549,8 @@
     [(emptyo l) (== t out)]
     [(fresh [a d res]
        (conso a d l)
-       (appendo d t res)
-       (conso a res out))]))
+       (conso a res out)
+       (appendo d t res))]))
 
 (run 1 [x]
   (appendo '(a b c) x '(a b c d e)))
@@ -570,4 +570,38 @@
 (run 6 [x y z]
   (appendo x y z))
 
+(run 6 [z]
+  (appendo '() 4 z))
+
 ; Continue on 2023-04-13 on ch 4, panel 23
+
+(run 6 [x y]
+  (appendo x y '(cake & ice d t)))
+
+(run 20 [x y]
+  (appendo x y '(cake & ice d t)))
+
+(defrel swappendo
+  [l t out]
+  (conde
+    [(fresh [a d res]
+       (conso a d l)
+       (conso a res out)
+       (swappendo d t res))]
+    [(emptyo l) (== t out)]))
+
+(run* [x y]
+  (swappendo x y '(cake & ice d t)))
+
+(defrel unwrapo
+  [x out]
+  (conde
+    [(fresh [a d]
+       (== (lcons a d) x)
+       (unwrapo a out))]
+    [(== x out)]))
+
+(run 4 [x]
+  (unwrapo '((pizza)) x))
+
+; Continue on 2023-04-20 on ch 4, panel 48
