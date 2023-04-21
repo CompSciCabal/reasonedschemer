@@ -605,3 +605,40 @@
   (unwrapo '((pizza)) x))
 
 ; Continue on 2023-04-20 on ch 4, panel 48
+
+(run* [x]
+  (unwrapo '(((pizza))) x))
+
+(defrel memo
+  [x l out]
+  (conde
+    [(caro l x)
+     (== l out)]
+    [(fresh [d]
+       (cdro l d)
+       (memo x d out))]))
+
+(run* [q]
+  (memo 'fig '(pea) '(pea)))
+
+(run* [q]
+  (memo 'fig '(fig pea fig fig) q))
+
+(defrel rembero
+  [x l out]
+  (conde
+    [(nullo l) (== '() out)]
+    [(== (lcons x out) l)]
+    [(fresh [a d res]
+       (== (lcons a d) l)
+       (conso a res out)
+       (rembero x d res))]))
+
+(run* [out]
+  (rembero 'pea '(a pea b pea c) out))
+
+(run* [out]
+  (fresh [y z]
+    (rembero y (list 'a 'b y 'd z 'e) out)))
+
+; Continue on 2023-04-27 on ch 5, panel 48
