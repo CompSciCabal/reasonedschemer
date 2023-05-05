@@ -631,14 +631,43 @@
     [(== (lcons x out) l)]
     [(fresh [a d res]
        (== (lcons a d) l)
-       (conso a res out)
+       ;(conso a res out)
+       (== (lcons a res) out)
        (rembero x d res))]))
+
+(run 5 [y z w out]
+  (rembero y (lcons z w) out))
+
+; 0: x=y l=(z . w) out=out  630->  631->y=z,w=out, (_0 _0 _1 _1)
+;    632->a=z,d=w,out=(z . ?), (rembero y w ?)
+;   1: x=y,l=w,out=?  630->w=(),y=?,z=?,out=?, (_0 _1 '() '())
+(run* [y z]
+  (rembero y (list y 'd z 'e) (list y 'd 'e)))
+
+; zeroth recursion x=y l=(y 'd z 'e) out=(y 'd 'e) => ('d 'd)
+; first recursion x=y l=('d z 'e) out=('d 'e)      => ('d 'd)
+; second recursion x=y l=(z 'e) out=('e)           => (_0 _0)
+; third recursion x=y l=('e) out=()                => ('e 'e)
 
 (run* [out]
   (rembero 'pea '(a pea b pea c) out))
 
 (run* [out]
+  (rembero 'pea '(a pea b pea c pea d) out))
+
+(run* [out]
   (fresh [y z]
     (rembero y (list 'a 'b y 'd z 'e) out)))
 
+(run* [out y z]
+  (rembero y (list 'a 'b y 'd z 'e) out))
+
 ; Continue on 2023-04-27 on ch 5, panel 48
+
+(run* [y z]
+  (rembero y (list y 'd z 'e) (list y 'd 'e)))
+
+(run 5 [y z w out]
+  (rembero y (lcons z w) out))
+
+; Resume on Chapter 6
