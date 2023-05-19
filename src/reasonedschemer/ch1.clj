@@ -671,3 +671,99 @@
   (rembero y (lcons z w) out))
 
 ; Resume on Chapter 6
+
+(defrel alwayso
+  []
+  (conde
+    [s#]
+    [(alwayso)]))
+
+; this hangs!
+#_(run 1 [q]
+  (alwayso)
+  u#)
+
+(run 1 [q]
+  u#
+  (alwayso))
+
+(defrel nevero
+  []
+  (nevero))
+
+(defrel very-recursiveo
+  []
+  (conde
+    ((nevero))
+    ((very-recursiveo))
+    ((alwayso))
+    ((very-recursiveo))
+    ((nevero))))
+
+(run 1000000 [q] (very-recursiveo))
+
+(defrel bit-xoro
+  [x y r]
+  (conde
+    ((== 0 x) (== 0 y) (== 0 r))
+    ((== 0 x) (== 1 y) (== 1 r))
+    ((== 1 x) (== 0 y) (== 1 r))
+    ((== 1 x) (== 1 y) (== 0 r))))
+
+(run* [x y]
+  (bit-xoro x y 0))
+
+(run* [x y]
+  (bit-xoro x y 1))
+
+(run* [x y r]
+  (bit-xoro x y r))
+
+(defrel bit-ando
+  [x y r]
+  (conde
+    ((== 0 x) (== 0 y) (== 0 r))
+    ((== 0 x) (== 1 y) (== 0 r))
+    ((== 1 x) (== 0 y) (== 0 r))
+    ((== 1 x) (== 1 y) (== 1 r))))
+
+(run* [x y]
+  (bit-ando x y 1))
+
+(defrel half-addero
+  [x y r c]
+  (bit-xoro x y r)
+  (bit-ando x y c))
+
+(run* [r]
+  (half-addero 1 1 r 1))
+
+(run* [x y r c] (half-addero x y r c))
+
+(defrel full-addero
+  [b x y r c]
+  (fresh [w xy wz]
+    (half-addero x y w xy)
+    (half-addero w b r wz)
+    (bit-xoro xy wz c)))
+
+(run* [r c]
+  (full-addero 0 1 1 r c))
+
+(defn build-num
+  [n]
+  (cond
+
+    (and (not (zero? n)) (even? n))
+    (cons 0 (build-num (int (/ n 2))))
+
+    (odd? n)
+    (cons 1 (build-num (int (/ n 2))))
+
+    (zero? n)
+    '()))
+
+#_(build-num 19)
+#_(build-num 36)
+
+; Resume at 7.57
