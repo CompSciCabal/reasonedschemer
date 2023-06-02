@@ -767,3 +767,37 @@
 #_(build-num 36)
 
 ; Resume at 7.57
+
+(defrel poso [n]
+  (fresh [a d]
+    (== (lcons a d) n)))
+
+(run* [q]
+  (poso '(0 1 1)))
+
+(run* [q]
+  (poso '()))
+
+(run 5 [r]
+  (poso r))
+
+; The names a, ad, dd correspond...
+(defrel >1o [n]
+  (fresh (a ad dd)
+    (== (lcons a (lcons ad dd)) n)))
+
+(run* [q]
+  (>1o '(0 1 1)))
+
+(run* [q]
+  (>1o '(1)))
+
+(run* [r]
+  (>1o r))
+
+(run* [r]
+  (== r '(1))
+  (>1o r))
+
+
+;; Resume at ch 7.104
