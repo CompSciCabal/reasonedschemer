@@ -801,3 +801,103 @@
 
 
 ;; Resume at ch 7.104
+
+(declare gen-addero)
+
+(defrel addero [b n m r]
+  (conde
+    [(== 0 b) (== '() m) (== n r)]
+    [(== 0 b) (== '() n) (== m r) (poso m)]
+    [(== 1 b) (== '() m) (addero 0 n '(1) r)]
+    [(== 1 b) (== '() n) (poso m) (addero 0 '(1) m r)]
+    [(== '(1) n) (== '(1) m) (fresh [a c]
+                               (== (list a c) r)
+                               (full-addero b 1 1 a c))]
+    [(== '(1) n) (gen-addero b n m r)]
+    [(== '(1) m) (>1o n) (>1o r) (addero b '(1) n r)]
+    [(>1o n) (gen-addero b n m r)]))
+
+(defrel gen-addero [b n m r]
+  (fresh [a c d e x y z]
+    (== (lcons a x) n)
+    (== (lcons d y) m) (poso y)
+    (== (lcons c z) r) (poso z)
+    (full-addero b a d c e)
+    (addero e x y z)))
+
+(run* [s]
+  (gen-addero 1 '(0 1 1) '(1 1) s))
+
+(defrel +o [n m k]
+  (addero 0 n m k))
+
+(run* [x y]
+  (+o x y '(1 0 1)))
+
+(defrel -o [n m k]
+  (+o m k n))
+
+(run* [q]
+  (-o '(0 0 0 1) '(1 0 1) q))
+
+(run* [q]
+  (-o '(0 1 1) '(0 1 1) q))
+
+(run* [q]
+  (-o '(0 1 1) '(0 0 0 1) q))
+
+(defrel lengtho [l r]
+  (conde
+    [(nullo l) (== r '())]
+    [(fresh [a d r-1]
+       (== (lcons a d) l)
+       (+o r-1 '(1) r)
+       (lengtho d r-1))]))
+
+(run 1 [n]
+  (lengtho '(jicama rhubarb guava) n))
+
+(run* [ls]
+  (lengtho ls '(1 0 1)))
+
+(run* [q]
+  (lengtho '(1 0 1) 3))
+
+(run 3 [q]
+  (lengtho q q))
+
+(run 4 [q]
+  (lengtho q q))
+
+(defrel sumo [n m r]
+  (conde
+    [(nullo n) (== m r)]
+    [(nullo m) (poso n) (== n r)]
+    [(poso n) (poso m) (nullo r)
+     (fresh [a x b y]
+      (== (lcons a x) n)
+      (== (lcons b y) m)
+      (== x y)
+      (bit-xoro a b 1))]
+    [(poso n)
+     (poso m)
+     (poso r)
+     (fresh [a x b y c z]
+       (== (lcons a x) n)
+       (== (lcons b y) m)
+       (== (lcons c z) r)
+       (conde
+         [(== a 0) (== b 0) (== c 0) (+o x y z)]
+         [(== a 0) (== b 1) (== c 0) (-o x y z)]
+         [(== a 1) (== b 0) (== c 0) (-o y x z)]
+         [(== a 0) (== b 1) (== c 1) (-o y x z)]
+         [(== a 1) (== b 0) (== c 1) (-o x y z)]
+         [(== a 1) (== b 1) (== c 1) (+o x y z)]))]))
+
+(run* [r]
+  (sumo '(0 1) '(0 1) r))
+
+(run* [r]
+  (sumo '(0 1) '(1 1) r))
+
+;; Resume at ch 7.126, which is just debugging the above
