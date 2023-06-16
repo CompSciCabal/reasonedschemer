@@ -881,7 +881,7 @@
       (bit-xoro a b 1))]
     [(poso n)
      (poso m)
-     (poso r)
+     (>1o r)
      (fresh [a x b y c z]
        (== (lcons a x) n)
        (== (lcons b y) m)
@@ -901,3 +901,5 @@
   (sumo '(0 1) '(1 1) r))
 
 ;; Resume at ch 7.126, which is just debugging the above
+
+;; Resume at ch 8.31
