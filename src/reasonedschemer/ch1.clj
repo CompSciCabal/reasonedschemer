@@ -900,6 +900,28 @@
 (run* [r]
   (sumo '(0 1) '(1 1) r))
 
+(run 10
+  [n m]
+  (sumo n '(0 1) m))
+
 ;; Resume at ch 7.126, which is just debugging the above
 
 ;; Resume at ch 8.31
+
+(defrel <=lo
+  [n m]
+  (conde
+    [(=lo n m)]
+    [(<lo n m)]))
+
+(defrel divo
+  [n m q r]
+  (conde
+    [(<o n m) (== q '()) (== r n)]
+    [(<=o m n)
+     (<o r m)
+     (fresh [mq]
+       (*o m q mq)
+       (+o mq r n))]))
+
+;; Restart on ch8, frame 57
