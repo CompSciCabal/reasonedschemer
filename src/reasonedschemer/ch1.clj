@@ -1,7 +1,7 @@
 ; vim: lispwords=fresh,run,run*:sw=2:
 (ns reasonedschemer.ch1
   (:require
-    [clojure.core.logic :refer [conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo emptyo]]
+    [clojure.core.logic :refer [conda conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo emptyo]]
     [reasonedschemer.util :refer [defrel]]))
 
 
@@ -927,3 +927,27 @@
 ;; Restart on ch8, frame 57
 
 ;; Restart on ch8, frame 78
+
+(defrel expo
+  [b q n]
+  (logo n b q '()))
+
+;; Resume on ch9
+
+(defrel not-pastao
+  [x]
+  (conda
+    [(== 'pasta x) u#]
+    [s# s#]))
+
+(run* [x]
+  (conda
+    [(not-pastao x) u#]
+    [(== 'spaghetti x) s#]))
+
+(run 5 [q]
+  (conda
+    [(alwayso) s#]
+    [s# u#]))
+
+;; Restart on ch9, frame 42
