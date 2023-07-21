@@ -1,7 +1,7 @@
 ; vim: lispwords=fresh,run,run*:sw=2:
 (ns reasonedschemer.ch1
   (:require
-    [clojure.core.logic :refer [conda conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo emptyo]]
+    [clojure.core.logic :refer [conda conde fresh fail run* run s# u# == firsto resto lcons lcons? conso nilo emptyo onceo]]
     [reasonedschemer.util :refer [defrel]]))
 
 
@@ -951,3 +951,38 @@
     [s# u#]))
 
 ;; Restart on ch9, frame 42
+
+(defrel bumpo [n x]
+  (conde
+    [(== n x)]
+    [(fresh [m]
+       (-o n '(1) m)
+       (bumpo m x))]))
+
+#_(run* [x]
+    (bumpo '(1 1 1) x))
+
+(defrel enumerateo
+  [op r n]
+  (fresh [i j k]
+    (bumpo n i)
+    (bumpo n j)
+    (op i j k)
+    (onceo
+      (fresh [x y z]
+        (op x y z)
+        (== i x)
+        (== j y)
+        (== k z)))
+    (== (list i j k) r)))
+
+#_(run* [s]
+    (enumerateo +o s '(1 1)))
+
+;; Chapter 10
+
+(defn var'
+  [v]
+  [v])
+
+;; Resume at ch 10, item 27
