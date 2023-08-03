@@ -985,4 +985,90 @@
   [v]
   [v])
 
+(defn var'?
+  [v]
+  (vector? v))
+
+(def empty-s {})
+
+(defn walk
+  [v s]
+  (if (contains? s v)
+      (recur (get s v) s)
+      v))
+
+#_
+(walk (var' 'z)
+      {['x] ['y],
+       ['y] 1})
+
 ;; Resume at ch 10, item 27
+
+(defn occurs?
+  [x v s]
+  (let [v (walk v s)]
+    (cond
+      (var'? v) (= v x)
+      (set? v)  (contains? v x))))
+
+#_
+(occurs? ['x] ['y] {['y] ['x]})
+
+#_
+(occurs? ['y] ['x] {['y] ['x]})
+
+#_
+(occurs? ['x] ['y] {['y] ['z],
+                    ['z] ['x]})
+
+#_
+(occurs? ['x] ['y] {['y] ['z],
+                    ['z] #{['x] 1}})
+
+#_
+(occurs? ['x] ['x] {})
+
+#_
+(occurs? ['x] #{['y]} {['y] ['x]})
+
+(defn ext-s
+  [x v s]
+  (when-not (occurs? x v s)
+    (assoc s x v)))
+
+#_
+(ext-s ['x] 1 {})
+
+#_
+(ext-s ['x] ['y] {['y] ['x]})
+
+#_
+(ext-s ['x] #{['x]} empty-s)
+
+#_
+(ext-s ['x] #{['y]} {['y] ['x]})
+
+#_
+(let [s {['z] ['x],
+         ['y] ['z]}]
+  (let [s (ext-s ['x] 'e s)]
+    (and s (walk ['y] s))))
+
+(defn unify
+  [u v s]
+  (let [u (walk u s)
+        v (walk v s)]
+    (cond
+
+      (= u v) s
+
+      (var'? u) (ext-s u v s)
+
+      (var'? v) (ext-s v u s)
+
+      (and (set? u)
+           (set? v))
+      (let [s (unify (first u) (first v) s)]
+        (and s (unify (rest u) (rest v) s))))))
+
+;; Resume on ch 10, frame 48
