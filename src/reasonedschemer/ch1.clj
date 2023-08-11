@@ -1009,7 +1009,7 @@
   (let [v (walk v s)]
     (cond
       (var'? v) (= v x)
-      (set? v)  (contains? v x))))
+      (list? v) (some #{x} v))))
 
 #_
 (occurs? ['x] ['y] {['y] ['x]})
@@ -1066,9 +1066,49 @@
 
       (var'? v) (ext-s v u s)
 
-      (and (set? u)
-           (set? v))
+      (and (list? u)
+           (list? v))
       (let [s (unify (first u) (first v) s)]
         (and s (unify (rest u) (rest v) s))))))
 
 ;; Resume on ch 10, frame 48
+
+(def ss
+  (fn [s]
+    (list s)))
+
+(def uu
+  (fn [s]
+    '()))
+
+(defn ===
+  [u v]
+  (fn [s]
+      (let [s (unify u v s)]
+        (if s
+            (list s)
+            '()))))
+
+#_((=== true false) empty-s)
+#_((=== false false) empty-s)
+#_((=== ['x] ['y]) empty-s)
+
+(defn appendoo
+  [soo too]
+  (cond
+    (nil? soo) too
+    (seq? soo) (cons (first soo)
+                     (appendoo (rest soo) too))
+    :else (fn []
+              (appendoo too (soo)))))
+
+(defn disj2
+  [g1 g2]
+  (fn [s]
+      (appendoo (g1 s) (g2 s))))
+
+#_(takeoo 3 ((alwayso) empty-s))
+
+#_(((nevero) empty-s))
+
+; Resume at ch 10, frame 104
