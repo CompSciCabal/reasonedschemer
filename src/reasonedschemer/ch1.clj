@@ -980,6 +980,16 @@
     (enumerateo +o s '(1 1)))
 
 ;; Chapter 10
+;;
+;; Notes on our Clojure implementation
+;;
+;; * Like Scheme, in Clojure we represent a single symbol in a vector to represent a var
+;; ** We define var' instead of var to avoid the Clojure function of the same name
+;; ** Perhaps we could have used just a symbol?
+;; * We use a regular map to store a substitution list instead of a list of pairs
+;; * The values of a substitution list are currently sets, but this may cause us problems in the future
+;; ** Perhaps we should change this to a list
+
 
 (defn var'
   [v]
@@ -994,8 +1004,8 @@
 (defn walk
   [v s]
   (if (contains? s v)
-      (recur (get s v) s)
-      v))
+    (recur (get s v) s)
+    v))
 
 #_
 (walk (var' 'z)
@@ -1093,14 +1103,26 @@
 #_((=== false false) empty-s)
 #_((=== ['x] ['y]) empty-s)
 
+
+(defn nil-or-empty?
+  "An empty list in Clojure is _not_ the same as nil, so we have to check
+  for either case where the book can just call (null? x)
+  "
+  [x]
+  (or (nil? x)
+      (and (sequential? x)
+           (empty? x))))
+
+
 (defn appendoo
   [soo too]
   (cond
-    (nil? soo) too
-    (seq? soo) (cons (first soo)
-                     (appendoo (rest soo) too))
-    :else (fn []
-              (appendoo too (soo)))))
+    (nil-or-empty? soo) too
+    (seq? soo)          (cons (first soo)
+                              (appendoo (rest soo) too))
+    :else               (fn []
+                            (appendoo too (soo)))))
+
 
 (defn disj2
   [g1 g2]
@@ -1111,4 +1133,99 @@
 
 #_(((nevero) empty-s))
 
-; Resume at ch 10, frame 104
+
+(defn alwayso
+  []
+  (fn [s]
+      (fn []
+          ((disj2 ss (alwayso)) s))))
+
+
+(defn takeoo
+  [n soo]
+  (cond
+    (and n (zero? n)) '()
+    (nil-or-empty? soo) '()
+    (seq? soo)          (cons (first soo)
+                              (takeoo (and n (dec n)) (rest soo)))
+    :else               (takeoo n (soo))))
+
+
+#_((=== 'olive ['x]) empty-s)
+#_(takeoo 1 ((disj2 (=== 'olive ['x]) (=== 'oil ['x])) empty-s))
+
+
+(defn append-mapoo
+  [g soo]
+  (cond
+    (nil-or-empty? soo) '()
+    (seq? soo)          (appendoo (g (first soo))
+                                  (append-mapoo g (rest soo)))
+    :else               (fn [] (append-mapoo g (soo)))))
+
+
+(defn conj2
+  [g1 g2]
+  (fn [s]
+      (append-mapoo g2 (g1 s))))
+
+
+#_((conj2 (=== ['x] 1) (=== ['x] 2)) empty-s)
+#_((conj2 (=== ['x] 1) (=== ['y] 2)) empty-s)
+
+
+(defn call-fresh
+  [name f]
+  (f (var' name)))
+
+#_(takeoo 1 ((call-fresh 'kiwi (fn [fruit] (=== 'plum fruit))) empty-s))
+
+
+(defn reify-name
+  [n]
+  (symbol (str "_" n)))
+
+#_(reify-name 27)
+
+
+(defn walk*
+  [v s]
+  (let [v (walk v s)]
+    (cond
+      (var'? v) v
+      (seq? v) (cons (walk* (first v) s)
+                     (walk* (rest v) s))
+      :else v)))
+
+
+(defn reify-s
+  [v r]
+  (let [v (walk v r)]
+    (cond
+      (var'? v) (let [n (count r)
+                      rn (reify-name n)]
+                  (assoc r v rn))
+      (seq? v) (let [r (reify-s (first v) r)]
+                 (reify-s (cdr v) r))
+      :else r)))
+
+
+(defn reify' ; avoid clojure.core/reify
+  [v]
+  (fn [s]
+      (let [v (walk* v s)
+            r (reify-s v empty-s)]
+        (walk* v r))))
+
+
+#_(map (reify ['x]) (takeoo 5 ((disj2 (=== 'olive ['x]) (=== 'oil ['x])) empty-s)))
+
+
+(defn run-goal
+  [n g]
+  (takeoo n (g empty-s)))
+
+
+#_(map (reify ['x]) (run-goal 5 (disj2 (=== 'olive ['x]) (=== 'oil ['x]))))
+
+
